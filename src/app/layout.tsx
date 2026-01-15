@@ -18,7 +18,13 @@ export default function RootLayout({
 }: Readonly<{ children: React.ReactNode }>) {
 	return (
 		<html lang="en">
-			<body className={`${font.variable} antialiased dark`}>{children}</body>
+			<body
+				className={`${font.variable} antialiased dark`}
+				data-new-gr-c-s-check-loaded="14.1268.0"
+				data-gr-ext-installed=""
+			>
+				{children}
+			</body>
 		</html>
 	);
 }

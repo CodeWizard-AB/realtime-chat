@@ -6,59 +6,52 @@ import {
 	InputGroupAddon,
 	InputGroupInput,
 } from "@/components/ui/input-group";
-import { HatGlasses, Terminal } from "lucide-react";
-import { useState, useEffect } from "react";
-import { nanoid } from "nanoid";
-import { Label } from "@/components/ui/label";
+import { HatGlasses, Key, Terminal, Timer } from "lucide-react";
 import { Button } from "@/components/ui/button";
-
-const STORAGE_KEY = "chat_username";
-const ADJECTIVES = [
-	"Swift",
-	"Brave",
-	"Clever",
-	"Fierce",
-	"Mighty",
-	"Wise",
-	"Bold",
-	"Nimble",
-	"Valiant",
-	"Fearless",
-];
-const ANIMALS = [
-	"Lion",
-	"Eagle",
-	"Wolf",
-	"Tiger",
-	"Falcon",
-	"Bear",
-	"Shark",
-	"Panther",
-	"Dragon",
-	"Hawk",
-];
-
-const generateUsername = () => {
-	const randomAdjective =
-		ADJECTIVES[Math.floor(Math.random() * ADJECTIVES.length)];
-	const randomAnimal = ANIMALS[Math.floor(Math.random() * ANIMALS.length)];
-
-	return `${randomAdjective}-${randomAnimal}-${nanoid(5)}`;
-};
+import { generateUsername } from "@/lib/helpers";
+import { Controller, useForm } from "react-hook-form";
+import {
+	Field,
+	FieldError,
+	FieldGroup,
+	FieldLabel,
+} from "@/components/ui/field";
+import { roomSchema, roomSchemaType } from "@/lib/zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { nanoid } from "nanoid";
+import {
+	Select,
+	SelectContent,
+	SelectItem,
+	SelectTrigger,
+	SelectValue,
+} from "@/components/ui/select";
+import { DURATIONS, STORAGE_KEY } from "@/lib/constants";
+import { useEffect } from "react";
 
 export default function Home() {
-	const [username, setUsername] = useState("");
+	const form = useForm<roomSchemaType>({
+		resolver: zodResolver(roomSchema),
+		mode: "all",
+		defaultValues: {
+			username: "",
+			roomId: nanoid(10),
+			duration: DURATIONS[0].value,
+		},
+	});
 
 	useEffect(() => {
-		let storedUsername = localStorage.getItem(STORAGE_KEY);
-
-		if (!storedUsername) {
-			storedUsername = generateUsername();
-			localStorage.setItem(STORAGE_KEY, storedUsername);
+		let username = localStorage.getItem(STORAGE_KEY);
+		if (!username) {
+			username = generateUsername();
+			localStorage.setItem(STORAGE_KEY, username);
 		}
-
-		setUsername(storedUsername);
+		form.setValue("username", username!);
 	}, []);
+
+	function onSubmit(data: roomSchemaType) {
+		console.log("Form Submitted:", data);
+	}
 
 	return (
 		<main className="flex min-h-screen flex-col items-center justify-center p-4">
@@ -71,22 +64,94 @@ export default function Home() {
 			</div>
 			<Card>
 				<CardContent>
-					<Label htmlFor="username" className="mb-4 block text-lg font-medium">
-						Your Private Room ID
-					</Label>
-					<InputGroup>
-						<InputGroupInput
-							id="username"
-							placeholder="Write your room ID"
-							defaultValue={username}
-						/>
-						<InputGroupAddon>
-							<HatGlasses />
-						</InputGroupAddon>
-					</InputGroup>
+					<form id="room-form" onSubmit={form.handleSubmit(onSubmit)}>
+						<FieldGroup>
+							<Controller
+								name="username"
+								control={form.control}
+								render={({ field, fieldState }) => (
+									<Field data-invalid={fieldState.invalid}>
+										<FieldLabel htmlFor={field.name}>Username</FieldLabel>
+										<InputGroup>
+											<InputGroupInput
+												{...field}
+												id={field.name}
+												placeholder="Write your username"
+											/>
+											<InputGroupAddon>
+												<HatGlasses />
+											</InputGroupAddon>
+										</InputGroup>
+									</Field>
+								)}
+							/>
+							<Controller
+								name="roomId"
+								control={form.control}
+								render={({ field, fieldState }) => (
+									<Field
+										orientation="responsive"
+										data-invalid={fieldState.invalid}
+									>
+										<FieldLabel htmlFor={field.name}>Room ID</FieldLabel>
+										<InputGroup>
+											<InputGroupInput
+												{...field}
+												id={field.name}
+												placeholder="Write your room ID"
+											/>
+											<InputGroupAddon>
+												<Key />
+											</InputGroupAddon>
+										</InputGroup>
+									</Field>
+								)}
+							/>
+							<Controller
+								name="duration"
+								control={form.control}
+								render={({ field, fieldState }) => (
+									<Field
+										orientation="responsive"
+										aria-invalid={fieldState.invalid}
+									>
+										<FieldLabel htmlFor={field.name}>Duration</FieldLabel>
+										<Select
+											name={field.name}
+											onValueChange={field.onChange}
+											value={field.value.toString()}
+										>
+											<SelectTrigger
+												id={field.name}
+												aria-invalid={fieldState.invalid}
+											>
+												<div className="flex items-center gap-2">
+													<Timer />
+													<SelectValue placeholder="Select Duration" />
+												</div>
+											</SelectTrigger>
+											<SelectContent>
+												{DURATIONS.map(({ label, value }, index) => (
+													<SelectItem key={index} value={value.toString()}>
+														{label}
+													</SelectItem>
+												))}
+											</SelectContent>
+										</Select>
+										{fieldState.invalid && (
+											<FieldError errors={[fieldState.error]} />
+										)}
+									</Field>
+								)}
+							/>
+						</FieldGroup>
+					</form>
 				</CardContent>
-				<CardFooter>
-					<Button className="w-full">Create Private Room</Button>
+				<CardFooter className="flex items-center gap-6">
+					<Field orientation="horizontal" className="gap-4">
+						<Button>Create Private Room</Button>
+						<Button>Join Private Chat</Button>
+					</Field>
 				</CardFooter>
 			</Card>
 		</main>
