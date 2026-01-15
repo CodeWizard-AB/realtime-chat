@@ -4,9 +4,17 @@ import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import {
 	InputGroup,
 	InputGroupAddon,
+	InputGroupButton,
 	InputGroupInput,
 } from "@/components/ui/input-group";
-import { HatGlasses, Key, Terminal, Timer } from "lucide-react";
+import {
+	Copy,
+	CopyCheck,
+	HatGlasses,
+	Key,
+	Terminal,
+	Timer,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { generateUsername } from "@/lib/helpers";
 import { Controller, useForm } from "react-hook-form";
@@ -27,15 +35,16 @@ import {
 	SelectValue,
 } from "@/components/ui/select";
 import { DURATIONS, STORAGE_KEY } from "@/lib/constants";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
 export default function Home() {
+	const [isCopied, setIsCopied] = useState(false);
 	const form = useForm<roomSchemaType>({
 		resolver: zodResolver(roomSchema),
 		mode: "all",
 		defaultValues: {
 			username: "",
-			roomId: nanoid(10),
+			roomId: nanoid(),
 			duration: DURATIONS[0].value,
 		},
 	});
@@ -48,6 +57,20 @@ export default function Home() {
 		}
 		form.setValue("username", username!);
 	}, []);
+
+	const copyLink = () => {
+		navigator.clipboard.writeText(form.getValues("roomId"));
+		setIsCopied(true);
+		setTimeout(() => setIsCopied(false), 2000);
+	};
+
+	const generateRoomId = () => {
+		const newRoomId = nanoid();
+		form.setValue("roomId", newRoomId, {
+			shouldDirty: true,
+			shouldTouch: true,
+		});
+	};
 
 	function onSubmit(data: roomSchemaType) {
 		console.log("Form Submitted:", data);
@@ -93,15 +116,39 @@ export default function Home() {
 										orientation="responsive"
 										data-invalid={fieldState.invalid}
 									>
-										<FieldLabel htmlFor={field.name}>Room ID</FieldLabel>
+										<div className="flex justify-between">
+											<FieldLabel htmlFor={field.name}>Room ID</FieldLabel>
+											<Button
+												size="sm"
+												type="button"
+												variant="secondary"
+												onClick={generateRoomId}
+											>
+												Generate Room ID
+											</Button>
+										</div>
 										<InputGroup>
+											<InputGroupAddon>
+												<Key />
+											</InputGroupAddon>
 											<InputGroupInput
 												{...field}
 												id={field.name}
 												placeholder="Write your room ID"
 											/>
-											<InputGroupAddon>
-												<Key />
+											<InputGroupAddon align="inline-end">
+												<InputGroupButton
+													aria-label="Copy"
+													title="copy"
+													size="icon-xs"
+													onClick={copyLink}
+												>
+													{isCopied ? (
+														<CopyCheck className="text-green-500" />
+													) : (
+														<Copy />
+													)}
+												</InputGroupButton>
 											</InputGroupAddon>
 										</InputGroup>
 									</Field>
