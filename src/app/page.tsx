@@ -57,7 +57,7 @@ export default function Home() {
 			localStorage.setItem(STORAGE_KEY, username);
 		}
 		form.setValue("username", username!);
-	}, []);
+	}, [form]);
 
 	const copyLink = () => {
 		navigator.clipboard.writeText(form.getValues("roomId"));
@@ -93,9 +93,13 @@ export default function Home() {
 							<Controller
 								name="avatar"
 								control={form.control}
-								render={({ fieldState }) => (
+								render={({ field, fieldState }) => (
 									<Field>
-										<AvatarUpload />
+										<AvatarUpload
+											onFileChange={(file) => {
+												field.onChange(file?.file as File);
+											}}
+										/>
 										{fieldState.error && (
 											<FieldError
 												className="text-center"

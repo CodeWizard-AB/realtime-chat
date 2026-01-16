@@ -10,8 +10,7 @@ export const roomSchema = z.object({
 	avatar: z
 		.file({ error: "File is required" })
 		.max(2 * 1024 * 1024, "Max file size is 2MB")
-		.mime(["image/jpeg", "image/png", "image/jpg"]),
-	// .optional(),
+		.mime(["image/jpeg", "image/png", "image/jpg"])
 });
 
 export type roomSchemaType = z.infer<typeof roomSchema>;
