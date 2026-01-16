@@ -36,12 +36,13 @@ import {
 } from "@/components/ui/select";
 import { DURATIONS, STORAGE_KEY } from "@/lib/constants";
 import { useEffect, useState } from "react";
+import AvatarUpload from "@/components/avatar-upload";
 
 export default function Home() {
-	const [isCopied, setIsCopied] = useState(false);
+	const [isCopied, setIsCopied] = useState<boolean>(false);
 	const form = useForm<roomSchemaType>({
 		resolver: zodResolver(roomSchema),
-		mode: "all",
+		mode: "onTouched",
 		defaultValues: {
 			username: "",
 			roomId: nanoid(),
@@ -90,6 +91,21 @@ export default function Home() {
 					<form id="room-form" onSubmit={form.handleSubmit(onSubmit)}>
 						<FieldGroup>
 							<Controller
+								name="avatar"
+								control={form.control}
+								render={({ fieldState }) => (
+									<Field>
+										<AvatarUpload />
+										{fieldState.error && (
+											<FieldError
+												className="text-center"
+												errors={[fieldState.error]}
+											/>
+										)}
+									</Field>
+								)}
+							/>
+							<Controller
 								name="username"
 								control={form.control}
 								render={({ field, fieldState }) => (
@@ -105,6 +121,9 @@ export default function Home() {
 												<HatGlasses />
 											</InputGroupAddon>
 										</InputGroup>
+										{fieldState.error && (
+											<FieldError errors={[fieldState.error]} />
+										)}
 									</Field>
 								)}
 							/>
@@ -151,6 +170,9 @@ export default function Home() {
 												</InputGroupButton>
 											</InputGroupAddon>
 										</InputGroup>
+										{fieldState.error && (
+											<FieldError errors={[fieldState.error]} />
+										)}
 									</Field>
 								)}
 							/>
@@ -196,7 +218,9 @@ export default function Home() {
 				</CardContent>
 				<CardFooter className="flex items-center gap-6">
 					<Field orientation="horizontal" className="gap-4">
-						<Button>Create Private Room</Button>
+						<Button onClick={form.handleSubmit(onSubmit)}>
+							Create Private Room
+						</Button>
 						<Button>Join Private Chat</Button>
 					</Field>
 				</CardFooter>
