@@ -50,25 +50,27 @@ export default function Home() {
 		},
 	});
 
-	useEffect(() => {
-		let username = localStorage.getItem(STORAGE_KEY);
-		if (!username) {
-			username = generateUsername();
-			localStorage.setItem(STORAGE_KEY, username);
-		}
-		form.setValue("username", username!);
-	}, [form]);
-
 	const copyLink = () => {
 		navigator.clipboard.writeText(form.getValues("roomId"));
 		setIsCopied(true);
 		setTimeout(() => setIsCopied(false), 2000);
 	};
 
-	const generateRoomId = () => {
+	const setRoomId = () => {
 		const newRoomId = nanoid();
 		form.setValue("roomId", newRoomId, {
 			shouldDirty: true,
+			shouldValidate: true,
+			shouldTouch: true,
+		});
+	};
+
+	const setUsername = () => {
+		const username = generateUsername();
+		localStorage.setItem(STORAGE_KEY, username);
+		form.setValue("username", username, {
+			shouldDirty: true,
+			shouldValidate: true,
 			shouldTouch: true,
 		});
 	};
@@ -77,8 +79,18 @@ export default function Home() {
 		console.log("Form Submitted:", data);
 	}
 
+	useEffect(() => {
+		let username = localStorage.getItem(STORAGE_KEY);
+		if (!username) {
+			username = generateUsername();
+			localStorage.setItem(STORAGE_KEY, username);
+		}
+		form.setValue("username", username!);
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, []);
+
 	return (
-		<main className="flex min-h-screen flex-col items-center justify-center p-4">
+		<main className="flex min-h-screen flex-col items-center justify-center px-6">
 			<div className="text-center mb-8 space-y-2">
 				<h1 className="text-xl flex items-center justify-center gap-2 font-bold text-primary">
 					<Terminal />
@@ -114,7 +126,17 @@ export default function Home() {
 								control={form.control}
 								render={({ field, fieldState }) => (
 									<Field data-invalid={fieldState.invalid}>
-										<FieldLabel htmlFor={field.name}>Username</FieldLabel>
+										<div className="flex justify-between">
+											<FieldLabel htmlFor={field.name}>Username</FieldLabel>
+											<Button
+												size="sm"
+												type="button"
+												variant="secondary"
+												onClick={setUsername}
+											>
+												Generate Username
+											</Button>
+										</div>
 										<InputGroup>
 											<InputGroupInput
 												{...field}
@@ -145,7 +167,7 @@ export default function Home() {
 												size="sm"
 												type="button"
 												variant="secondary"
-												onClick={generateRoomId}
+												onClick={setRoomId}
 											>
 												Generate Room ID
 											</Button>
@@ -220,8 +242,11 @@ export default function Home() {
 						</FieldGroup>
 					</form>
 				</CardContent>
-				<CardFooter className="flex items-center gap-6">
-					<Field orientation="horizontal" className="gap-4">
+				<CardFooter>
+					<Field
+						orientation="horizontal"
+						className="gap-4 flex flex-wrap sm:flex-nowrap *:w-full sm:*:w-max"
+					>
 						<Button onClick={form.handleSubmit(onSubmit)}>
 							Create Private Room
 						</Button>
