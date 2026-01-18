@@ -3,9 +3,9 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev", 
-    "build": "next build", 
-    "start": "next start", 
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
     "lint": "eslint"
   },
   "dependencies": {
@@ -17,9 +17,12 @@
     "@radix-ui/react-separator": "^1.1.8",
     "@radix-ui/react-slot": "^1.2.4",
     "@tanstack/react-query": "^5.90.17",
+    "@upstash/realtime": "^1.0.2",
+    "@upstash/redis": "^1.36.1",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "elysia": "^1.4.22",
+    "imagekit": "^6.0.0",
     "lucide-react": "^0.562.0",
     "nanoid": "^5.1.6",
     "next": "16.1.1",

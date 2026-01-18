@@ -37,6 +37,7 @@ import {
 import { DURATIONS, STORAGE_KEY } from "@/lib/constants";
 import { useEffect, useState } from "react";
 import AvatarUpload from "@/components/avatar-upload";
+import { client } from "@/lib/client";
 
 export default function Home() {
 	const [isCopied, setIsCopied] = useState<boolean>(false);
@@ -49,6 +50,8 @@ export default function Home() {
 			duration: DURATIONS[0].value,
 		},
 	});
+
+	console.log(form.watch("duration"));
 
 	const copyLink = () => {
 		navigator.clipboard.writeText(form.getValues("roomId"));
@@ -75,9 +78,11 @@ export default function Home() {
 		});
 	};
 
-	function onSubmit(data: roomSchemaType) {
+	const onSubmit = async (data: roomSchemaType) => {
 		console.log("Form Submitted:", data);
-	}
+		const value = await client.post(data);
+		console.log(value);
+	};
 
 	useEffect(() => {
 		let username = localStorage.getItem(STORAGE_KEY);
@@ -213,7 +218,9 @@ export default function Home() {
 										<FieldLabel htmlFor={field.name}>Duration</FieldLabel>
 										<Select
 											name={field.name}
-											onValueChange={field.onChange}
+											onValueChange={() => {
+												field.onChange(+field.value);
+											}}
 											value={field.value.toString()}
 										>
 											<SelectTrigger
