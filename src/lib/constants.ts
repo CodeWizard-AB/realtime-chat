@@ -34,3 +34,8 @@ export const DURATIONS = [
 	{ label: "50 Minutes", value: 50 * 60 },
 	{ label: "60 Minutes", value: 60 * 60 },
 ];
+
+export const CHAT_TYPES = [
+	{ label: "Private", value: "private" },
+	{ label: "Group", value: "group" },
+];

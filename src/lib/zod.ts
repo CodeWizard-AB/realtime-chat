@@ -14,6 +14,7 @@ export const roomSchema = z.object({
 		.file({ error: "File is required" })
 		.max(2 * 1024 * 1024, "Max file size is 2MB")
 		.mime(["image/jpeg", "image/png", "image/jpg"]),
+	type: z.enum(["private", "group"]),
 });
 
 export type roomSchemaType = z.infer<typeof roomSchema>;

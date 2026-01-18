@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { JetBrains_Mono } from "next/font/google";
+import { Providers } from "@/components/providers";
 
 const font = JetBrains_Mono({
 	subsets: ["latin"],
@@ -23,7 +24,7 @@ export default function RootLayout({
 				data-new-gr-c-s-check-loaded="14.1268.0"
 				data-gr-ext-installed=""
 			>
-				{children}
+				<Providers>{children}</Providers>
 			</body>
 		</html>
 	);

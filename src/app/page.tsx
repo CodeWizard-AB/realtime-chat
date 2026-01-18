@@ -12,6 +12,7 @@ import {
 	CopyCheck,
 	HatGlasses,
 	Key,
+	MessageSquareQuote,
 	Terminal,
 	Timer,
 } from "lucide-react";
@@ -34,7 +35,7 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from "@/components/ui/select";
-import { DURATIONS, STORAGE_KEY } from "@/lib/constants";
+import { CHAT_TYPES, DURATIONS, STORAGE_KEY } from "@/lib/constants";
 import { useEffect, useState } from "react";
 import AvatarUpload from "@/components/avatar-upload";
 import { client } from "@/lib/client";
@@ -48,6 +49,7 @@ export default function Home() {
 			username: "",
 			roomId: nanoid(),
 			duration: DURATIONS[0].value,
+			type: "private",
 		},
 	});
 
@@ -80,7 +82,7 @@ export default function Home() {
 
 	const onSubmit = async (data: roomSchemaType) => {
 		console.log("Form Submitted:", data);
-		const value = await client.post(data);
+		const value = await client.room.post(data);
 		console.log(value);
 	};
 
@@ -243,6 +245,43 @@ export default function Home() {
 										{fieldState.invalid && (
 											<FieldError errors={[fieldState.error]} />
 										)}
+									</Field>
+								)}
+							/>
+							<Controller
+								name="type"
+								control={form.control}
+								render={({ field, fieldState }) => (
+									<Field
+										orientation="responsive"
+										aria-invalid={fieldState.invalid}
+									>
+										<FieldLabel id={field.name}>Chat type</FieldLabel>
+										<Select
+											name={field.name}
+											onValueChange={field.onChange}
+											value={field.value}
+										>
+											<SelectTrigger
+												id={field.name}
+												aria-invalid={fieldState.invalid}
+											>
+												<div className="flex items-center gap-2">
+													<MessageSquareQuote />
+													<SelectValue placeholder="Select Duration" />
+												</div>
+											</SelectTrigger>
+											<SelectContent>
+												{CHAT_TYPES.map(({ label, value }) => (
+													<SelectItem key={value} value={value}>
+														{label}
+													</SelectItem>
+												))}
+											</SelectContent>
+											{fieldState.invalid && (
+												<FieldError errors={[fieldState.error]} />
+											)}
+										</Select>
 									</Field>
 								)}
 							/>
