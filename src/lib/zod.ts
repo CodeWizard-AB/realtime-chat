@@ -8,8 +8,8 @@ export const createRoomSchema = z.object({
 	roomId: z.nanoid("Invalid room id"),
 	duration: z
 		.number({ error: "Duration is required" })
-		.min(10 * 60)
-		.max(60 * 60),
+		.min(10 * 60, "The room must last at least 10 minutes.")
+		.max(60 * 60, "The room can’t last longer than 60 minutes."),
 	avatar: z
 		.file({ error: "File is required" })
 		.max(2 * 1024 * 1024, "Max file size is 2MB")

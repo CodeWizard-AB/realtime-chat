@@ -1,5 +1,7 @@
 export const STORAGE_KEY = "chat_username";
 
+export const RESERVED_USERNAMES = ["admin", "system", "support"];
+
 export const ADJECTIVES = [
 	"Swift",
 	"Brave",
