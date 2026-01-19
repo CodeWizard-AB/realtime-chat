@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-export const roomSchema = z.object({
+export const createRoomSchema = z.object({
 	username: z
 		.string({ error: "Username is required" })
 		.min(5, "Username must be at least 5 characters")
@@ -17,4 +17,10 @@ export const roomSchema = z.object({
 	type: z.enum(["private", "group"]),
 });
 
-export type roomSchemaType = z.infer<typeof roomSchema>;
+export const joinRoomSchema = createRoomSchema.omit({
+	duration: true,
+	type: true,
+});
+
+export type createRoomSchemaType = z.infer<typeof createRoomSchema>;
+export type joinRoomSchemaType = z.infer<typeof joinRoomSchema>;
