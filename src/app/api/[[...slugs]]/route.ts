@@ -41,7 +41,7 @@ const app = new Elysia({ prefix: "/api/room" })
 
 			try {
 				// * USERNAME LOCK
-				const lock = await redis.set(lockKey, "1", {
+				const lock = await redis.set(lockKey, true, {
 					nx: true,
 					ex: 5,
 				});

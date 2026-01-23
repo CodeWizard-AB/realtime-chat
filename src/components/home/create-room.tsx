@@ -6,7 +6,13 @@ import {
 	InputGroupAddon,
 	InputGroupInput,
 } from "@/components/ui/input-group";
-import { HatGlasses, Key, MessageSquareQuote, Timer } from "lucide-react";
+import {
+	AlertCircleIcon,
+	HatGlasses,
+	Key,
+	MessageSquareQuote,
+	Timer,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { generateUsername } from "@/lib/helpers";
 import { Controller, useForm } from "react-hook-form";
@@ -30,6 +36,8 @@ import { CHAT_TYPES, DURATIONS, STORAGE_KEY } from "@/lib/constants";
 import { useEffect } from "react";
 import AvatarUpload from "@/components/avatar-upload";
 import { client } from "@/lib/client";
+import { Alert, AlertDescription } from "../ui/alert";
+import { Spinner } from "../ui/spinner";
 
 export default function CreateRoom() {
 	const form = useForm<createRoomSchemaType>({
@@ -63,7 +71,6 @@ export default function CreateRoom() {
 	};
 
 	const onSubmit = async (data: createRoomSchemaType) => {
-		console.log("Form Submitted:", data);
 		const value = await client.room.create.post(data);
 		console.log(value);
 	};
@@ -250,7 +257,27 @@ export default function CreateRoom() {
 			</CardContent>
 			<CardFooter>
 				<Field orientation="responsive">
-					<Button form="create-room-form">Create Private Room</Button>
+					{
+						<Alert className="text-red-400 rounded-none">
+							<AlertCircleIcon />
+							<AlertDescription>
+								Your payment could not be processed. Please check your payment
+								method and try again.
+							</AlertDescription>
+						</Alert>
+					}
+					<Button
+						form="create-room-form"
+						disabled={form.formState.isSubmitting}
+					>
+						{form.formState.isSubmitting ? (
+							<>
+								<Spinner /> Room Creating...
+							</>
+						) : (
+							"Create Private Room"
+						)}
+					</Button>
 				</Field>
 			</CardFooter>
 		</Card>
