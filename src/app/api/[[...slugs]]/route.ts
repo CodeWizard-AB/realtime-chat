@@ -15,7 +15,7 @@ const app = new Elysia({ prefix: "/api/room" })
 			if (!success) {
 				set.status = 400;
 				return {
-					error: "Invalid data input",
+					message: "Invalid data input",
 					issues: error.issues,
 				};
 			}
@@ -31,7 +31,7 @@ const app = new Elysia({ prefix: "/api/room" })
 			if (RESERVED_USERNAMES.includes(username.toLowerCase())) {
 				set.status = 403;
 				return {
-					error: "This username is reserved. Please choose another one.",
+					message: "This username is reserved. Please choose another one.",
 				};
 			}
 
@@ -48,7 +48,7 @@ const app = new Elysia({ prefix: "/api/room" })
 
 				if (!lock) {
 					set.status = 409;
-					return { error: "Username is busy right now. Try later." };
+					return { message: "Username is busy right now. Try later." };
 				}
 
 				// * CHECK EXISTING ROOM
@@ -56,7 +56,7 @@ const app = new Elysia({ prefix: "/api/room" })
 				if (existingRoom) {
 					set.status = 409;
 					return {
-						error:
+						message:
 							"You already have an active room. You can only create one room at a time.",
 					};
 				}
@@ -71,7 +71,7 @@ const app = new Elysia({ prefix: "/api/room" })
 				if (ipCount > 1) {
 					set.status = 403;
 					return {
-						error:
+						message:
 							"You’ve created too many rooms in a short time. Please wait a bit and try again.",
 					};
 				}
@@ -130,14 +130,14 @@ const app = new Elysia({ prefix: "/api/room" })
 			const room = await redis.hgetall(`room:${roomId}`);
 			if (!room || !Object.keys(room).length) {
 				set.status = 404;
-				return { error: "ROOM_NOT_FOUND" };
+				return { message: "Room doesn't found." };
 			}
 
 			// * CHECK ROOM EXPIRY
 			const now = Math.floor(Date.now() / 1000);
 			if (Number(room.expiresAt) <= now) {
 				set.status = 410;
-				return { error: "ROOM_EXPIRED" };
+				return { message: "Room has been expired." };
 			}
 
 			// * ADD USER TO MEMBERS

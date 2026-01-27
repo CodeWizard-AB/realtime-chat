@@ -33,13 +33,14 @@ import {
 	SelectValue,
 } from "@/components/ui/select";
 import { CHAT_TYPES, DURATIONS, STORAGE_KEY } from "@/lib/constants";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import AvatarUpload from "@/components/avatar-upload";
 import { client } from "@/lib/client";
 import { Alert, AlertDescription } from "../ui/alert";
 import { Spinner } from "../ui/spinner";
 
 export default function CreateRoom() {
+	const [error, setError] = useState<string | undefined>();
 	const form = useForm<createRoomSchemaType>({
 		resolver: zodResolver(createRoomSchema),
 		mode: "onTouched",
@@ -71,8 +72,10 @@ export default function CreateRoom() {
 	};
 
 	const onSubmit = async (data: createRoomSchemaType) => {
-		const value = await client.room.create.post(data);
-		console.log(value);
+		const { error } = await client.room.create.post(data);
+		if (error) {
+			setError(error?.value?.message);
+		}
 	};
 
 	useEffect(() => {
@@ -257,15 +260,12 @@ export default function CreateRoom() {
 			</CardContent>
 			<CardFooter>
 				<Field orientation="responsive">
-					{
+					{error && !form.formState.isSubmitting && (
 						<Alert className="text-red-400 rounded-none">
 							<AlertCircleIcon />
-							<AlertDescription>
-								Your payment could not be processed. Please check your payment
-								method and try again.
-							</AlertDescription>
+							<AlertDescription>{error}</AlertDescription>
 						</Alert>
-					}
+					)}
 					<Button
 						form="create-room-form"
 						disabled={form.formState.isSubmitting}
