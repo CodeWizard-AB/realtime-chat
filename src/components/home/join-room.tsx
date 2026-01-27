@@ -6,7 +6,7 @@ import {
 	InputGroupAddon,
 	InputGroupInput,
 } from "@/components/ui/input-group";
-import { HatGlasses, Key } from "lucide-react";
+import { AlertCircleIcon, HatGlasses, Key } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { generateUsername } from "@/lib/helpers";
 import { Controller, useForm } from "react-hook-form";
@@ -19,11 +19,14 @@ import {
 import { joinRoomSchema, joinRoomSchemaType } from "@/lib/zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { STORAGE_KEY } from "@/lib/constants";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import AvatarUpload from "@/components/avatar-upload";
 import { client } from "@/lib/client";
+import { Alert, AlertDescription } from "../ui/alert";
+import { Spinner } from "../ui/spinner";
 
 export default function JoinRoom() {
+	const [error, setError] = useState<undefined | string>();
 	const form = useForm<joinRoomSchemaType>({
 		resolver: zodResolver(joinRoomSchema),
 		mode: "onTouched",
@@ -44,9 +47,10 @@ export default function JoinRoom() {
 	};
 
 	const onSubmit = async (data: joinRoomSchemaType) => {
-		console.log("Form Submitted:", data);
-		const value = await client.room.join.post(data);
-		console.log(value);
+		const { error } = await client.room.join.post(data);
+		if (error) {
+			setError(error?.value?.message);
+		}
 	};
 
 	useEffect(() => {
@@ -145,7 +149,21 @@ export default function JoinRoom() {
 			</CardContent>
 			<CardFooter>
 				<Field orientation="responsive">
-					<Button form="join-room-form">Join Private Room</Button>
+					{error && !form.formState.isSubmitting && (
+						<Alert className="text-red-400 rounded-none">
+							<AlertCircleIcon />
+							<AlertDescription>{error}</AlertDescription>
+						</Alert>
+					)}
+					<Button form="join-room-form" disabled={form.formState.isSubmitting}>
+						{form.formState.isSubmitting ? (
+							<>
+								<Spinner /> Joining Room...
+							</>
+						) : (
+							"Join Private Room"
+						)}
+					</Button>
 				</Field>
 			</CardFooter>
 		</Card>

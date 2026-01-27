@@ -272,7 +272,7 @@ export default function CreateRoom() {
 					>
 						{form.formState.isSubmitting ? (
 							<>
-								<Spinner /> Room Creating...
+								<Spinner /> Creating Room...
 							</>
 						) : (
 							"Create Private Room"
